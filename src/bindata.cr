@@ -90,14 +90,8 @@ abstract class BinData
         {% end %}
 
         {% if part[:type] == "basic" %}
-          {% part_type = part[:cls].resolve %}
-          {% if part_type.is_a?(Union) %}
-            @{{part[:name]}} = io.read_bytes({{part_type.types.reject { |pt| pt.nilable? }[0]}}, __format__)
-          {% elsif part_type.union? %}
-            @{{part[:name]}} = io.read_bytes({{part_type.union_types.reject { |pt| pt.nilable? }[0]}}, __format__)
-          {% else %}
+          {% part_type = part[:cls] %}
             @{{part[:name]}} = io.read_bytes({{part[:cls]}}, __format__)
-          {% end %}
 
         {% elsif part[:type] == "array" %}
           %size = ({{part[:length]}}).call.not_nil!
@@ -207,16 +201,8 @@ abstract class BinData
         {% end %}
 
         {% if part[:type] == "basic" %}
-          {% part_type = part[:cls].resolve %}
-          {% if part_type.is_a?(Union) || part_type.union? %}
-            if __temp_{{part[:name]}} = @{{part[:name]}}
-              wrote += io.write_bytes(__temp_{{part[:name]}}, __format__)
-            else
-              raise NilAssertionError.new("unable to write nil value for #{self.class}##{{{part[:name].stringify}}}")
-            end
-          {% else %}
+          {% part_type = part[:cls] %}
             wrote += io.write_bytes(@{{part[:name]}}, __format__)
-          {% end %}
 
         {% elsif part[:type] == "array" || part[:type] == "variable_array" %}
           @{{part[:name]}}.each do |part|
