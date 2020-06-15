@@ -345,8 +345,9 @@ abstract class BinData
     end
   end
 
-  macro byte_bool(name, default = false)
-    bits(8, {{name.id}}, default: ({{default}} ? 1 : 0) )
+  macro byte_bool(name, default = false, onlyif = nil, verify = nil, value = nil)
+    {% PARTS << {type: "basic", name: name.id, cls: "UInt8".id, onlyif: onlyif, verify: verify, value: value} %}
+    @{{name.id}} : UInt8 = {{default ? 1 : 0}}
 
     def {{name.id}} : Bool
       @{{name.id}} != 0
