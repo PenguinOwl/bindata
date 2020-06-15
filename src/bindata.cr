@@ -345,6 +345,19 @@ abstract class BinData
     end
   end
 
+  macro byte_bool(name, default = false)
+    bits(8, {{name.id}}, default: ({{default}} ? 1 : 0) )
+
+    def {{name.id}} : Bool
+      @{{name.id}} != 0
+    end
+
+    def {{name.id}}=(value : Bool)
+      # Ensure the correct type is being assigned
+      @{{name.id}} = UInt8.new(value ? 1 : 0)
+    end
+  end
+
   macro bit_field(onlyif = nil, verify = nil, &block)
     {% INDEX[0] = INDEX[0] + 1 %}
     {% BIT_PARTS << {} of Nil => Nil %}
